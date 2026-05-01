@@ -1,0 +1,4 @@
+.Renviron
+.env
+*.log
+.DS_Store
