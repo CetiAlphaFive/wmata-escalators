@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DC Metro Escalator Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; color: #222; }
+  h1 { margin: 0 0 0.25rem; font-size: 1.4rem; }
+  .meta { color: #666; font-size: 0.85rem; margin-bottom: 1rem; }
+  .summary { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .pill { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem;
+          border: 1px solid #ddd; background: #fafafa; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #eee; text-align: left;
+           vertical-align: top; }
+  th { background: #f5f5f5; font-weight: 600; cursor: default; user-select: none; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .code { font-family: ui-monospace, monospace; color: #888; font-size: 0.85rem; }
+  .units { font-size: 0.8rem; color: #555; max-width: 360px; }
+  .dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+         vertical-align: middle; }
+  .dot-green  { background: #2ecc71; }
+  .dot-yellow { background: #f1c40f; }
+  .dot-red    { background: #e74c3c; }
+  .dot-gray   { background: #bbb; }
+  .row-red td { background: #fff5f4; }
+  .row-yellow td { background: #fffdf2; }
+  footer { margin-top: 2rem; color: #888; font-size: 0.8rem; }
+  a { color: #2858b8; }
+</style>
+</head>
+<body>
+<h1>DC Metro Escalator Status</h1>
+<div class="meta">
+  Latest snapshot: <strong>2026-05-01 19:11 UTC</strong> · Page generated: 2026-05-01 19:17 UTC
+</div>
+<div class="summary">
+  <span class="pill"><span class="dot dot-green"></span> 77 all up</span>
+  <span class="pill"><span class="dot dot-yellow"></span> 19 one down</span>
+  <span class="pill"><span class="dot dot-red"></span> 6 multiple down</span>
+  
+</div>
+<table>
+<thead>
+<tr><th></th><th>Station</th><th>Code</th><th>Now</th>
+    <th class="num">Day uptime</th><th class="num">Week uptime</th>
+    <th>Currently down</th></tr>
+</thead>
+<tbody>
+
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Addison Road-Seat Pleasant</td>
+  <td class="code">G03</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Anacostia</td>
+  <td class="code">F06</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Archives-Navy Memorial-Penn Quarter</td>
+  <td class="code">F02</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-red">
+  <td><span class="dot dot-red" title="3 down"></span></td>
+  <td>Arlington Cemetery</td>
+  <td class="code">C06</td>
+  <td>3 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">C06X05: Escalator between mezzanine and platform to Franconia-Springfield (Service Call)<br>C06X06: Escalator between mezzanine and platform to Largo Town Center (Service Call)<br>C06X07: Escalator between mezzanine and platform to Largo Town Center (Service Call)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Ashburn</td>
+  <td class="code">N12</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Ballston-MU</td>
+  <td class="code">K04</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">K04X05: Escalator between middle landing and mezzanine (Other)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Benning Road</td>
+  <td class="code">G01</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Bethesda</td>
+  <td class="code">A09</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Braddock Road</td>
+  <td class="code">C12</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">C12X02: Escalator between mezzanine and platform (Minor Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Branch Ave</td>
+  <td class="code">F11</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Brookland-CUA</td>
+  <td class="code">B05</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Capitol Heights</td>
+  <td class="code">G02</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Capitol South</td>
+  <td class="code">D05</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Cheverly</td>
+  <td class="code">D11</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Clarendon</td>
+  <td class="code">K02</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Cleveland Park</td>
+  <td class="code">A05</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>College Park-U of Md</td>
+  <td class="code">E09</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Columbia Heights</td>
+  <td class="code">E04</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Congress Heights</td>
+  <td class="code">F07</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Court House</td>
+  <td class="code">K01</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Crystal City</td>
+  <td class="code">C09</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Deanwood</td>
+  <td class="code">D10</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-red">
+  <td><span class="dot dot-red" title="2 down"></span></td>
+  <td>Downtown Largo</td>
+  <td class="code">G05</td>
+  <td>2 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">G05X02: Escalator between mezzanine and platform (Minor Repair)<br>G05X03: Escalator between mezzanine and platform (Inspection Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Dunn Loring-Merrifield</td>
+  <td class="code">K07</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Dupont Circle</td>
+  <td class="code">A03</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">A03S03: Escalator between street and mezzanine (Preventive Maintenance Inspection)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>East Falls Church</td>
+  <td class="code">K05</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Eastern Market</td>
+  <td class="code">D06</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Eisenhower Avenue</td>
+  <td class="code">C14</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Farragut North</td>
+  <td class="code">A02</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Farragut West</td>
+  <td class="code">C03</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">C03W03: Escalator between street and mezzanine (Minor Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Federal Center SW</td>
+  <td class="code">D04</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Federal Triangle</td>
+  <td class="code">D01</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Foggy Bottom-GWU</td>
+  <td class="code">C04</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">C04X02: Escalator between street and mezzanine (Modernization)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Forest Glen</td>
+  <td class="code">B09</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Fort Totten</td>
+  <td class="code">B06</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">E06X06: Escalator between mezzanine and lower platform for Green Line (Inspection Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Fort Totten</td>
+  <td class="code">E06</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Franconia-Springfield</td>
+  <td class="code">J03</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Friendship Heights</td>
+  <td class="code">A08</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">A08N07: Escalator between mezzanine and platform (Minor Repair)</td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Gallery Pl-Chinatown</td>
+  <td class="code">B01</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">B01W05: Escalator between mezzanine and platform to Glenmont (Service Call)</td>
+</tr>
+<tr class="row-red">
+  <td><span class="dot dot-red" title="2 down"></span></td>
+  <td>Gallery Pl-Chinatown</td>
+  <td class="code">F01</td>
+  <td>2 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">F01N02: Escalator between street and middle landing (Major Repair)<br>F01N03: Escalator between street and middle landing (Other)</td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Georgia Ave-Petworth</td>
+  <td class="code">E05</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">E05X04: Escalator between street and mezzanine, west side at New Hampshire &amp; Georgia Ave. (Inspection Repair)</td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Glenmont</td>
+  <td class="code">B11</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">B11X03: Escalator between street and mezzanine, east side of station at bus bay/Kiss &amp; Ride (Safety Inspection)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Greenbelt</td>
+  <td class="code">E10</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Greensboro</td>
+  <td class="code">N03</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Grosvenor-Strathmore</td>
+  <td class="code">A11</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Herndon</td>
+  <td class="code">N08</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Huntington</td>
+  <td class="code">C15</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Hyattsville Crossing</td>
+  <td class="code">E08</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Innovation Center</td>
+  <td class="code">N09</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Judiciary Square</td>
+  <td class="code">B02</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">B02S07: Escalator between mezzanine and platform to Glenmont (Other)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>King St-Old Town</td>
+  <td class="code">C13</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-red">
+  <td><span class="dot dot-red" title="2 down"></span></td>
+  <td>L&#x27;Enfant Plaza</td>
+  <td class="code">D03</td>
+  <td>2 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">D03E06: Escalator between mezzanine and platform to Blue/Orange Line (escalator closer to station entrance) (Major Repair)<br>D03W01: Escalator between street and mezzanine (Modernization)</td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>L&#x27;Enfant Plaza</td>
+  <td class="code">F03</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">F03N03: Escalator between street and mezzanine (Other)</td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Landover</td>
+  <td class="code">D12</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">D12X02: Escalator between mezzanine and platform (Major Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Loudoun Gateway</td>
+  <td class="code">N11</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>McLean</td>
+  <td class="code">N01</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">N01X03: Escalator - between mezzanine to grade/street (Other)</td>
+</tr>
+<tr class="row-red">
+  <td><span class="dot dot-red" title="3 down"></span></td>
+  <td>McPherson Square</td>
+  <td class="code">C02</td>
+  <td>3 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">C02E02: Escalator between street and mezzanine (Minor Repair)<br>C02E04: Escalator between mezzanine and platform to New Carrollton/Largo Town Center (Service Call)<br>C02W01: Escalator between street and mezzanine (Inspection Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Medical Center</td>
+  <td class="code">A10</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Metro Center</td>
+  <td class="code">A01</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Metro Center</td>
+  <td class="code">C01</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Minnesota Ave</td>
+  <td class="code">D09</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Morgan Boulevard</td>
+  <td class="code">G04</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Mt Vernon Sq 7th St-Convention Center</td>
+  <td class="code">E01</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Navy Yard-Ballpark</td>
+  <td class="code">F05</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Naylor Road</td>
+  <td class="code">F09</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>New Carrollton</td>
+  <td class="code">D13</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>NoMa-Gallaudet U</td>
+  <td class="code">B35</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>North Bethesda</td>
+  <td class="code">A12</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Pentagon</td>
+  <td class="code">C07</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">C07N11: Escalator between upper and lower platforms (Minor Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Pentagon City</td>
+  <td class="code">C08</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Potomac Ave</td>
+  <td class="code">D07</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Potomac Yard</td>
+  <td class="code">C11</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Reston Town Center</td>
+  <td class="code">N07</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Rhode Island Ave-Brentwood</td>
+  <td class="code">B04</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Rockville</td>
+  <td class="code">A14</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Ronald Reagan Washington National Airport</td>
+  <td class="code">C10</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Rosslyn</td>
+  <td class="code">C05</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">C05X02: Escalator between mezzanine and upper platform (Modernization)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Shady Grove</td>
+  <td class="code">A15</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Shaw-Howard U</td>
+  <td class="code">E02</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">E02N03: Escalator between mezzanine and platform (Major Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Silver Spring</td>
+  <td class="code">B08</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>Smithsonian</td>
+  <td class="code">D02</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">D02N05: Escalator between mezzanine and platform to Vienna/Franconia-Springfield (Minor Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Southern Avenue</td>
+  <td class="code">F08</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Spring Hill</td>
+  <td class="code">N04</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Stadium-Armory</td>
+  <td class="code">D08</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Suitland</td>
+  <td class="code">F10</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Takoma</td>
+  <td class="code">B07</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Tenleytown-AU</td>
+  <td class="code">A07</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Twinbrook</td>
+  <td class="code">A13</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Tysons</td>
+  <td class="code">N02</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>U Street/African-Amer Civil War Memorial/Cardozo</td>
+  <td class="code">E03</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Union Station</td>
+  <td class="code">B03</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Van Dorn Street</td>
+  <td class="code">J02</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Van Ness-UDC</td>
+  <td class="code">A06</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Vienna/Fairfax-GMU</td>
+  <td class="code">K08</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Virginia Square-GMU</td>
+  <td class="code">K03</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Washington Dulles International Airport</td>
+  <td class="code">N10</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Waterfront</td>
+  <td class="code">F04</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>West Falls Church</td>
+  <td class="code">K06</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-yellow">
+  <td><span class="dot dot-yellow" title="1 down"></span></td>
+  <td>West Hyattsville</td>
+  <td class="code">E07</td>
+  <td>1 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">E07X02: Escalator between mezzanine and platform to Greenbelt (Major Repair)</td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Wheaton</td>
+  <td class="code">B10</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-green">
+  <td><span class="dot dot-green" title="all up"></span></td>
+  <td>Wiehle-Reston East</td>
+  <td class="code">N06</td>
+  <td>all up</td>
+  <td class="num">100%</td>
+  <td class="num">100%</td>
+  <td class="units"></td>
+</tr>
+<tr class="row-red">
+  <td><span class="dot dot-red" title="2 down"></span></td>
+  <td>Woodley Park-Zoo/Adams Morgan</td>
+  <td class="code">A04</td>
+  <td>2 down</td>
+  <td class="num">0%</td>
+  <td class="num">0%</td>
+  <td class="units">A04X05: Escalator between middle landing and mezzanine (Service Call)<br>A04X06: Escalator between middle landing and mezzanine (Service Call)</td>
+</tr>
+</tbody>
+</table>
+<footer>
+  Uptime = % of hourly snapshots with zero outages reported at that station.
+  Day = trailing 24 h (2 snapshots). Week = trailing 7 d (2 snapshots).
+  Source: <a href="https://developer.wmata.com/">WMATA API</a> · scraper:
+  <a href="https://github.com/CetiAlphaFive/wmata-escalators">wmata-escalators</a>.
+</footer>
+</body>
+</html>
