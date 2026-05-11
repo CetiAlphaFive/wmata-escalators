@@ -43,17 +43,20 @@ def load_snapshots():
 
 def compute_metrics(stations, rows, all_ts):
     if not all_ts:
-        return {code: dict(current=None, day=None, week=None, latest=None,
-                           current_units=[]) for code, _, _ in stations}
+        return {code: dict(current=None, day=None, week=None, overall=None,
+                           latest=None, current_units=[], week_series=[])
+                for code, _, _ in stations}
 
     latest_ts = all_ts[-1]
     day_cutoff = latest_ts - DAY
     week_cutoff = latest_ts - WEEK
 
     by_snapshot = defaultdict(set)
+    down_count = defaultdict(lambda: defaultdict(int))
     detail = defaultdict(lambda: defaultdict(list))
     for r in rows:
         by_snapshot[r["_ts"]].add(r["StationCode"])
+        down_count[r["_ts"]][r["StationCode"]] += 1
         detail[r["_ts"]][r["StationCode"]].append(r)
 
     day_ts = [t for t in all_ts if t > day_cutoff]
@@ -70,12 +73,16 @@ def compute_metrics(stations, rows, all_ts):
             up = sum(1 for t in ts_list if code not in by_snapshot[t])
             return up / len(ts_list)
 
+        week_series = [down_count[t].get(code, 0) for t in week_ts]
+
         out[code] = dict(
             current=current_count,
             day=uptime(day_ts),
             week=uptime(week_ts),
+            overall=uptime(all_ts),
             latest=latest_ts,
             current_units=current_units,
+            week_series=week_series,
         )
     return out
 
@@ -92,6 +99,75 @@ def light(current):
 
 def fmt_pct(x):
     return "—" if x is None else f"{x*100:.0f}%"
+
+
+def uptime_bg(x):
+    """Gradient bg color for an uptime fraction (0..1). None → blank."""
+    if x is None:
+        return ""
+    # 1.0 → green, 0.95 → yellow, ≤0.80 → red. Interpolate in HSL.
+    if x >= 0.95:
+        # 120° (green) at 1.0 → 60° (yellow) at 0.95
+        h = 60 + (x - 0.95) / 0.05 * 60
+    else:
+        # 60° (yellow) at 0.95 → 0° (red) at 0.80
+        h = max(0, (x - 0.80) / 0.15 * 60)
+    return f"background:hsl({h:.0f}, 75%, 88%);"
+
+
+def sparkline_svg(series, width=120, height=14):
+    """Render week down-count series as compact SVG bars.
+
+    0 (all up) → green tick at baseline. n>0 → red bar scaled by max.
+    """
+    if not series:
+        return ""
+    n = len(series)
+    bar_w = width / n
+    peak = max(series) or 1
+    parts = [f'<svg class="spark" viewBox="0 0 {width} {height}" '
+             f'preserveAspectRatio="none" width="{width}" height="{height}">']
+    for i, v in enumerate(series):
+        x = i * bar_w
+        w = max(bar_w - 0.3, 0.5)
+        if v == 0:
+            parts.append(f'<rect x="{x:.2f}" y="{height-2}" width="{w:.2f}" '
+                         f'height="2" fill="#2ecc71"/>')
+        else:
+            h = max(2, (v / peak) * (height - 1))
+            parts.append(f'<rect x="{x:.2f}" y="{height-h:.2f}" width="{w:.2f}" '
+                         f'height="{h:.2f}" fill="#e74c3c"/>')
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def worst_table(stations_by_code, metrics, key, label, n=10):
+    """Top-n stations by downtime (1 - uptime[key])."""
+    ranked = []
+    for code, m in metrics.items():
+        u = m.get(key)
+        if u is None:
+            continue
+        ranked.append((1 - u, code, m))
+    ranked.sort(reverse=True)
+    rows = []
+    for rank, (down, code, m) in enumerate(ranked[:n], 1):
+        if down <= 0:
+            break
+        name = stations_by_code.get(code, code)
+        style = uptime_bg(1 - down)
+        rows.append(
+            f'<tr><td class="rank">{rank}</td>'
+            f'<td>{html.escape(name)}</td>'
+            f'<td class="code">{html.escape(code)}</td>'
+            f'<td class="num" style="{style}">{down*100:.1f}%</td></tr>'
+        )
+    if not rows:
+        rows.append('<tr><td colspan="4" class="empty">no downtime recorded</td></tr>')
+    return (f'<div class="worst-card"><h3>{label}</h3>'
+            f'<table class="worst"><thead><tr><th>#</th><th>Station</th>'
+            f'<th>Code</th><th class="num">Down</th></tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody></table></div>')
 
 
 def render(stations, metrics, all_ts):
@@ -115,6 +191,10 @@ def render(stations, metrics, all_ts):
         line_chips = "".join(
             f'<span class="line-chip line-{l}" title="{l}">{l}</span>' for l in lines
         )
+        spark = sparkline_svg(m.get("week_series", []))
+        day_style = uptime_bg(m["day"])
+        week_style = uptime_bg(m["week"])
+        overall_style = uptime_bg(m["overall"])
         rows_html.append(f"""
 <tr class="row-{color}" data-status="{color}" data-lines="{','.join(lines)}">
   <td><span class="dot dot-{color}" title="{label}"></span></td>
@@ -122,8 +202,10 @@ def render(stations, metrics, all_ts):
   <td class="code">{html.escape(code)}</td>
   <td class="lines-cell">{line_chips}</td>
   <td>{label}</td>
-  <td class="num">{fmt_pct(m['day'])}</td>
-  <td class="num">{fmt_pct(m['week'])}</td>
+  <td class="num" style="{day_style}">{fmt_pct(m['day'])}</td>
+  <td class="num" style="{week_style}">{fmt_pct(m['week'])}</td>
+  <td class="num" style="{overall_style}">{fmt_pct(m['overall'])}</td>
+  <td class="spark-cell">{spark}</td>
   <td class="units">{units_text}</td>
 </tr>""")
 
@@ -131,6 +213,18 @@ def render(stations, metrics, all_ts):
     summary_yellow = sum(1 for m in metrics.values() if m["current"] == 1)
     summary_red = sum(1 for m in metrics.values() if (m["current"] or 0) >= 2)
     summary_unknown = sum(1 for m in metrics.values() if m["current"] is None)
+    fully_up_week = sum(1 for m in metrics.values()
+                        if m["week"] is not None and m["week"] >= 0.999)
+    partial_week = sum(1 for m in metrics.values()
+                       if m["week"] is not None and m["week"] < 0.999)
+
+    name_by_code = {code: name for code, name, _ in stations}
+    worst_panels = (
+        '<div class="worst-grid">'
+        + worst_table(name_by_code, metrics, "week", "10 Worst — Last Week")
+        + worst_table(name_by_code, metrics, "overall", "10 Worst — Overall")
+        + "</div>"
+    )
 
     latest_str = latest.strftime("%Y-%m-%d %H:%M UTC") if latest else "no snapshots yet"
     generated = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -197,6 +291,21 @@ def render(stations, metrics, all_ts):
   .dot-gray   {{ background: #bbb; }}
   .row-red td {{ background: #fff5f4; }}
   .row-yellow td {{ background: #fffdf2; }}
+  .spark-cell {{ width: 130px; padding: 0.3rem 0.4rem; }}
+  .spark {{ display: block; }}
+  .summary-stats {{ display: flex; gap: 1rem; flex-wrap: wrap;
+                    margin: 0.5rem 0 1rem; font-size: 0.85rem; color: #555; }}
+  .summary-stats span strong {{ color: #222; }}
+  .worst-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+                 margin: 1.5rem 0; }}
+  @media (max-width: 700px) {{ .worst-grid {{ grid-template-columns: 1fr; }} }}
+  .worst-card {{ border: 1px solid #e5e5e5; border-radius: 6px; padding: 0.75rem 1rem;
+                 background: #fafafa; }}
+  .worst-card h3 {{ margin: 0 0 0.5rem; font-size: 1rem; }}
+  table.worst {{ width: 100%; font-size: 0.85rem; }}
+  table.worst th, table.worst td {{ padding: 0.25rem 0.4rem; }}
+  table.worst .rank {{ color: #888; width: 1.5rem; text-align: right; }}
+  table.worst .empty {{ color: #888; text-align: center; padding: 0.6rem; }}
   footer {{ margin-top: 2rem; color: #888; font-size: 0.8rem; }}
   a {{ color: #2858b8; }}
 </style>
@@ -225,10 +334,15 @@ def render(stations, metrics, all_ts):
   </div>
   <button class="reset-btn" id="reset-filters">Reset</button>
 </div>
+<div class="summary-stats">
+  <span>Past week: <strong>{fully_up_week}</strong> fully up · <strong>{partial_week}</strong> partially up (any outage)</span>
+</div>
+{worst_panels}
 <table>
 <thead>
 <tr><th></th><th>Station</th><th>Code</th><th>Lines</th><th>Now</th>
-    <th class="num">Day uptime</th><th class="num">Week uptime</th>
+    <th class="num">Day</th><th class="num">Week</th><th class="num">Overall</th>
+    <th>Week trend</th>
     <th>Currently down</th></tr>
 </thead>
 <tbody id="station-rows">
