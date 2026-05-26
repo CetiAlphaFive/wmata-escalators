@@ -15,6 +15,17 @@ OUT = ROOT / "docs" / "index.html"
 DAY = dt.timedelta(days=1)
 WEEK = dt.timedelta(days=7)
 
+# WMATA line code → brand color. Single source of truth.
+# Used by both .line-pill (filter buttons) and .line-chip (row badges).
+LINE_COLORS = {
+    "RD": "#BF0D3E",
+    "OR": "#ED8B00",
+    "YL": "#d6a800",
+    "GR": "#00B140",
+    "BL": "#009CDE",
+    "SV": "#7a8585",
+}
+
 
 def parse_ts(s: str) -> dt.datetime:
     return dt.datetime.fromisoformat(s.replace("Z", "+00:00"))
@@ -170,6 +181,134 @@ def worst_table(stations_by_code, metrics, key, label, n=10):
             f'<tbody>{"".join(rows)}</tbody></table></div>')
 
 
+def _line_color_rules():
+    """Emit CSS rules for both .line-pill and .line-chip per LINE_COLORS.
+
+    Plain string concat — no f-string braces to escape.
+    """
+    parts = []
+    for code, color in LINE_COLORS.items():
+        parts.append("  .line-pill.line-" + code + " { background: " + color + "; }")
+    for code, color in LINE_COLORS.items():
+        parts.append("  .line-chip.line-" + code + " { background: " + color + "; }")
+    return "\n".join(parts)
+
+
+def _line_filter_pills():
+    """Emit <span class='pill line-pill line-XX' ...> for each line."""
+    return "\n    ".join(
+        '<span class="pill line-pill line-' + code + '" data-filter-line="' + code + '">' + code + '</span>'
+        for code in LINE_COLORS
+    )
+
+
+# Plain (non-f) strings → no `{{` `}}` doubling needed.
+# Interpolated into the final f-string via {CSS} and {JS} placeholders.
+CSS = """
+  body { font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; color: #222; }
+  h1 { margin: 0 0 0.25rem; font-size: 1.4rem; }
+  .meta { color: #666; font-size: 0.85rem; margin-bottom: 1rem; }
+  .filters { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+              margin-bottom: 1rem; }
+  .filter-group { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 0.8rem; color: #666; margin-right: 0.25rem; }
+  .pill { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem;
+          border: 1px solid #ddd; background: #fafafa; cursor: pointer;
+          user-select: none; transition: opacity 0.15s, filter 0.15s; }
+  .pill:hover { background: #f0f0f0; }
+  .pill.off { opacity: 0.35; filter: grayscale(0.6); }
+  .line-pill { color: white; font-weight: 600; border: none;
+                padding: 0.2rem 0.7rem; }
+""" + _line_color_rules() + """
+  .reset-btn { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 4px;
+                border: 1px solid #ccc; background: white; cursor: pointer; }
+  .reset-btn:hover { background: #f0f0f0; }
+  .lines-cell { white-space: nowrap; }
+  .line-chip { display: inline-block; color: white; font-size: 0.7rem;
+                font-weight: 600; padding: 0.1rem 0.35rem; border-radius: 3px;
+                margin-right: 2px; }
+  .empty-msg { padding: 1.5rem; text-align: center; color: #888; display: none; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #eee; text-align: left;
+           vertical-align: top; }
+  th { background: #f5f5f5; font-weight: 600; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .code { font-family: ui-monospace, monospace; color: #888; font-size: 0.85rem; }
+  .units { font-size: 0.8rem; color: #555; max-width: 360px; }
+  .dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+         vertical-align: middle; }
+  .dot-green  { background: #2ecc71; }
+  .dot-yellow { background: #f1c40f; }
+  .dot-red    { background: #e74c3c; }
+  .dot-gray   { background: #bbb; }
+  .row-red td { background: #fff5f4; }
+  .row-yellow td { background: #fffdf2; }
+  .spark-cell { width: 130px; padding: 0.3rem 0.4rem; }
+  .spark { display: block; }
+  .summary-stats { display: flex; gap: 1rem; flex-wrap: wrap;
+                    margin: 0.5rem 0 1rem; font-size: 0.85rem; color: #555; }
+  .summary-stats span strong { color: #222; }
+  .worst-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+                 margin: 1.5rem 0; }
+  @media (max-width: 700px) { .worst-grid { grid-template-columns: 1fr; } }
+  .worst-card { border: 1px solid #e5e5e5; border-radius: 6px; padding: 0.75rem 1rem;
+                 background: #fafafa; }
+  .worst-card h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+  table.worst { width: 100%; font-size: 0.85rem; }
+  table.worst th, table.worst td { padding: 0.25rem 0.4rem; }
+  table.worst .rank { color: #888; width: 1.5rem; text-align: right; }
+  table.worst .empty { color: #888; text-align: center; padding: 0.6rem; }
+  footer { margin-top: 2rem; color: #888; font-size: 0.8rem; }
+  a { color: #2858b8; }
+"""
+
+JS = """
+(function() {
+  var pills = document.querySelectorAll('.pill[data-filter-status], .pill[data-filter-line]');
+  var rows = document.querySelectorAll('#station-rows tr');
+  var emptyMsg = document.getElementById('empty-msg');
+  var resetBtn = document.getElementById('reset-filters');
+
+  function activeSet(attr) {
+    var s = new Set();
+    document.querySelectorAll('.pill[' + attr + ']').forEach(function(p) {
+      if (!p.classList.contains('off')) s.add(p.getAttribute(attr));
+    });
+    return s;
+  }
+
+  function apply() {
+    var statuses = activeSet('data-filter-status');
+    var lines = activeSet('data-filter-line');
+    var shown = 0;
+    rows.forEach(function(r) {
+      var s = r.getAttribute('data-status');
+      var ls = (r.getAttribute('data-lines') || '').split(',').filter(Boolean);
+      var statusOk = statuses.size === 0 || statuses.has(s);
+      var lineOk = lines.size === 0 || ls.some(function(l) { return lines.has(l); });
+      var visible = statusOk && lineOk;
+      r.style.display = visible ? '' : 'none';
+      if (visible) shown++;
+    });
+    emptyMsg.style.display = shown === 0 ? 'block' : 'none';
+  }
+
+  pills.forEach(function(p) {
+    p.addEventListener('click', function() {
+      p.classList.toggle('off');
+      apply();
+    });
+  });
+
+  resetBtn.addEventListener('click', function() {
+    pills.forEach(function(p) { p.classList.remove('off'); });
+    apply();
+  });
+})();
+"""
+
+
 def render(stations, metrics, all_ts):
     latest = all_ts[-1] if all_ts else None
     day_ts_count = sum(1 for t in all_ts if t > (latest - DAY)) if latest else 0
@@ -234,81 +373,16 @@ def render(stations, metrics, all_ts):
         unknown_pill = (f"<span class='pill' data-filter-status='gray'>"
                         f"<span class='dot dot-gray'></span> {summary_unknown} no data</span>")
 
+    line_pills_html = _line_filter_pills()
+    rows_joined = "".join(rows_html)
+
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>DC Metro Escalator Status</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  body {{ font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-         max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; color: #222; }}
-  h1 {{ margin: 0 0 0.25rem; font-size: 1.4rem; }}
-  .meta {{ color: #666; font-size: 0.85rem; margin-bottom: 1rem; }}
-  .filters {{ display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
-              margin-bottom: 1rem; }}
-  .filter-group {{ display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }}
-  .filter-label {{ font-size: 0.8rem; color: #666; margin-right: 0.25rem; }}
-  .pill {{ padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem;
-          border: 1px solid #ddd; background: #fafafa; cursor: pointer;
-          user-select: none; transition: opacity 0.15s, filter 0.15s; }}
-  .pill:hover {{ background: #f0f0f0; }}
-  .pill.off {{ opacity: 0.35; filter: grayscale(0.6); }}
-  .line-pill {{ color: white; font-weight: 600; border: none;
-                padding: 0.2rem 0.7rem; }}
-  .line-pill.line-RD {{ background: #BF0D3E; }}
-  .line-pill.line-OR {{ background: #ED8B00; }}
-  .line-pill.line-YL {{ background: #d6a800; }}
-  .line-pill.line-GR {{ background: #00B140; }}
-  .line-pill.line-BL {{ background: #009CDE; }}
-  .line-pill.line-SV {{ background: #7a8585; }}
-  .reset-btn {{ font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 4px;
-                border: 1px solid #ccc; background: white; cursor: pointer; }}
-  .reset-btn:hover {{ background: #f0f0f0; }}
-  .lines-cell {{ white-space: nowrap; }}
-  .line-chip {{ display: inline-block; color: white; font-size: 0.7rem;
-                font-weight: 600; padding: 0.1rem 0.35rem; border-radius: 3px;
-                margin-right: 2px; }}
-  .line-chip.line-RD {{ background: #BF0D3E; }}
-  .line-chip.line-OR {{ background: #ED8B00; }}
-  .line-chip.line-YL {{ background: #d6a800; }}
-  .line-chip.line-GR {{ background: #00B140; }}
-  .line-chip.line-BL {{ background: #009CDE; }}
-  .line-chip.line-SV {{ background: #7a8585; }}
-  .empty-msg {{ padding: 1.5rem; text-align: center; color: #888; display: none; }}
-  table {{ width: 100%; border-collapse: collapse; }}
-  th, td {{ padding: 0.4rem 0.6rem; border-bottom: 1px solid #eee; text-align: left;
-           vertical-align: top; }}
-  th {{ background: #f5f5f5; font-weight: 600; }}
-  .num {{ text-align: right; font-variant-numeric: tabular-nums; }}
-  .code {{ font-family: ui-monospace, monospace; color: #888; font-size: 0.85rem; }}
-  .units {{ font-size: 0.8rem; color: #555; max-width: 360px; }}
-  .dot {{ display: inline-block; width: 14px; height: 14px; border-radius: 50%;
-         vertical-align: middle; }}
-  .dot-green  {{ background: #2ecc71; }}
-  .dot-yellow {{ background: #f1c40f; }}
-  .dot-red    {{ background: #e74c3c; }}
-  .dot-gray   {{ background: #bbb; }}
-  .row-red td {{ background: #fff5f4; }}
-  .row-yellow td {{ background: #fffdf2; }}
-  .spark-cell {{ width: 130px; padding: 0.3rem 0.4rem; }}
-  .spark {{ display: block; }}
-  .summary-stats {{ display: flex; gap: 1rem; flex-wrap: wrap;
-                    margin: 0.5rem 0 1rem; font-size: 0.85rem; color: #555; }}
-  .summary-stats span strong {{ color: #222; }}
-  .worst-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-                 margin: 1.5rem 0; }}
-  @media (max-width: 700px) {{ .worst-grid {{ grid-template-columns: 1fr; }} }}
-  .worst-card {{ border: 1px solid #e5e5e5; border-radius: 6px; padding: 0.75rem 1rem;
-                 background: #fafafa; }}
-  .worst-card h3 {{ margin: 0 0 0.5rem; font-size: 1rem; }}
-  table.worst {{ width: 100%; font-size: 0.85rem; }}
-  table.worst th, table.worst td {{ padding: 0.25rem 0.4rem; }}
-  table.worst .rank {{ color: #888; width: 1.5rem; text-align: right; }}
-  table.worst .empty {{ color: #888; text-align: center; padding: 0.6rem; }}
-  footer {{ margin-top: 2rem; color: #888; font-size: 0.8rem; }}
-  a {{ color: #2858b8; }}
-</style>
+<style>{CSS}</style>
 </head>
 <body>
 <h1>DC Metro Escalator Status</h1>
@@ -325,12 +399,7 @@ def render(stations, metrics, all_ts):
   </div>
   <div class="filter-group">
     <span class="filter-label">Line:</span>
-    <span class="pill line-pill line-RD" data-filter-line="RD">RD</span>
-    <span class="pill line-pill line-OR" data-filter-line="OR">OR</span>
-    <span class="pill line-pill line-YL" data-filter-line="YL">YL</span>
-    <span class="pill line-pill line-GR" data-filter-line="GR">GR</span>
-    <span class="pill line-pill line-BL" data-filter-line="BL">BL</span>
-    <span class="pill line-pill line-SV" data-filter-line="SV">SV</span>
+    {line_pills_html}
   </div>
   <button class="reset-btn" id="reset-filters">Reset</button>
 </div>
@@ -346,54 +415,11 @@ def render(stations, metrics, all_ts):
     <th>Currently down</th></tr>
 </thead>
 <tbody id="station-rows">
-{''.join(rows_html)}
+{rows_joined}
 </tbody>
 </table>
 <div class="empty-msg" id="empty-msg">No stations match current filters.</div>
-<script>
-(function() {{
-  var pills = document.querySelectorAll('.pill[data-filter-status], .pill[data-filter-line]');
-  var rows = document.querySelectorAll('#station-rows tr');
-  var emptyMsg = document.getElementById('empty-msg');
-  var resetBtn = document.getElementById('reset-filters');
-
-  function activeSet(attr) {{
-    var s = new Set();
-    document.querySelectorAll('.pill[' + attr + ']').forEach(function(p) {{
-      if (!p.classList.contains('off')) s.add(p.getAttribute(attr));
-    }});
-    return s;
-  }}
-
-  function apply() {{
-    var statuses = activeSet('data-filter-status');
-    var lines = activeSet('data-filter-line');
-    var shown = 0;
-    rows.forEach(function(r) {{
-      var s = r.getAttribute('data-status');
-      var ls = (r.getAttribute('data-lines') || '').split(',').filter(Boolean);
-      var statusOk = statuses.size === 0 || statuses.has(s);
-      var lineOk = lines.size === 0 || ls.some(function(l) {{ return lines.has(l); }});
-      var visible = statusOk && lineOk;
-      r.style.display = visible ? '' : 'none';
-      if (visible) shown++;
-    }});
-    emptyMsg.style.display = shown === 0 ? 'block' : 'none';
-  }}
-
-  pills.forEach(function(p) {{
-    p.addEventListener('click', function() {{
-      p.classList.toggle('off');
-      apply();
-    }});
-  }});
-
-  resetBtn.addEventListener('click', function() {{
-    pills.forEach(function(p) {{ p.classList.remove('off'); }});
-    apply();
-  }});
-}})();
-</script>
+<script>{JS}</script>
 <footer>
   Click status or line pills to filter. Click again to re-enable.
   Uptime = % of hourly snapshots with zero outages reported at that station.
