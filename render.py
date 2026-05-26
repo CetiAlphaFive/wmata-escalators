@@ -11,6 +11,7 @@ ROOT = pathlib.Path(__file__).parent
 SNAPSHOTS = ROOT / "data" / "escalator_outages.csv"
 STATIONS = ROOT / "data" / "stations.csv"
 OUT = ROOT / "docs" / "index.html"
+INVENTORY = ROOT / "data" / "escalator_inventory.csv"
 
 DAY = dt.timedelta(days=1)
 WEEK = dt.timedelta(days=7)
@@ -38,6 +39,23 @@ def load_stations():
             lines = [x for x in (r.get("Lines") or "").split(",") if x]
             out.append((r["StationCode"], r["StationName"], lines))
     return out
+
+
+
+
+def load_inventory():
+    """Return {StationCode: int|None}. None = pending/unknown.
+
+    See notes/inventory_sources.md. Built by scripts/build_inventory.py.
+    """
+    inv = {}
+    if not INVENTORY.exists():
+        return inv
+    with INVENTORY.open() as f:
+        for r in csv.DictReader(f):
+            v = r["escalator_count"]
+            inv[r["StationCode"]] = int(v) if v else None
+    return inv
 
 
 def load_snapshots():
@@ -98,14 +116,16 @@ def compute_metrics(stations, rows, all_ts):
     return out
 
 
-def light(current):
+def light(current, total=None):
     if current is None:
         return "gray", "no data"
+    suffix = f" / {total}" if total else ""
     if current == 0:
-        return "green", "all up"
+        label = "all up" if total is None else f"0{suffix} down"
+        return "green", label
     if current == 1:
-        return "yellow", "1 down"
-    return "red", f"{current} down"
+        return "yellow", f"1{suffix} down"
+    return "red", f"{current}{suffix} down"
 
 
 def fmt_pct(x):
@@ -309,7 +329,8 @@ JS = """
 """
 
 
-def render(stations, metrics, all_ts):
+def render(stations, metrics, all_ts, inventory=None):
+    inventory = inventory or {}
     latest = all_ts[-1] if all_ts else None
     day_ts_count = sum(1 for t in all_ts if t > (latest - DAY)) if latest else 0
     week_ts_count = sum(1 for t in all_ts if t > (latest - WEEK)) if latest else 0
@@ -317,7 +338,8 @@ def render(stations, metrics, all_ts):
     rows_html = []
     for code, name, lines in sorted(stations, key=lambda x: x[1]):
         m = metrics[code]
-        color, label = light(m["current"])
+        total = inventory.get(code)
+        color, label = light(m["current"], total)
         units_text = ""
         if m["current_units"]:
             parts = []
@@ -426,6 +448,8 @@ def render(stations, metrics, all_ts):
   Day = trailing 24 h ({day_ts_count} snapshots). Week = trailing 7 d ({week_ts_count} snapshots).
   Source: <a href="https://developer.wmata.com/">WMATA API</a> · scraper:
   <a href="https://github.com/CetiAlphaFive/wmata-escalators">wmata-escalators</a>.
+  Per-station escalator counts inferred from <code>UnitName</code> ordinals
+  in the outage feed; see <code>notes/inventory_sources.md</code>.
 </footer>
 </body>
 </html>
@@ -437,7 +461,8 @@ def main():
     stations = load_stations()
     rows, all_ts = load_snapshots()
     metrics = compute_metrics(stations, rows, all_ts)
-    OUT.write_text(render(stations, metrics, all_ts))
+    inventory = load_inventory()
+    OUT.write_text(render(stations, metrics, all_ts, inventory))
     print(f"wrote {OUT} with {len(stations)} stations, {len(all_ts)} snapshots")
 
 
