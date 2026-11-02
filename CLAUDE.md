@@ -18,6 +18,9 @@ The static site is the only published surface. The Shiny app is for ad-hoc inspe
 # Scrape one snapshot (appends to data/escalator_outages.csv)
 WMATA_API_KEY=... ./scrape.sh
 
+# Dry-run the hourly relay loop once (no commit, push or dispatch)
+BUDGET_SECONDS=5 DRY_RUN=1 WMATA_API_KEY=... ./scripts/scrape_loop.sh
+
 # Rebuild docs/index.html from CSV history
 python3 render.py
 
@@ -49,7 +52,13 @@ No tests, no linter, no build step beyond `render.py`. Python stdlib only (no re
 
 ### Hourly pipeline (GitHub Actions, `.github/workflows/scrape.yml`)
 
-`cron: "0 * * * *"` → `scrape.sh` → `render.py` → commit `data/` + `docs/` → push. Concurrency group `scrape` prevents overlapping runs. Bot identity: `github-actions[bot]`. The push step is self-healing: on a non-fast-forward rejection it rebases the append-only CSV, re-renders `docs/index.html` from the merged data (never 3-way-merges generated HTML), amends into the single snapshot commit, and retries. If you push manually, expect frequent merges from the bot.
+**Self-chaining relay, not one cron run per snapshot.** GitHub's scheduler dropped most `0 * * * *` runs (~19/day in May 2026, ~5/day by Sept–Oct, so about half of all hours are missing from the CSV). Since 2026-11-01 each run executes `scripts/scrape_loop.sh`, which stays up ~5.5 h (job timeout 355 min), takes one snapshot at :02 past every UTC hour (`scrape.sh` → `scripts/commit_snapshot.sh`), skips an hour already in the CSV, then dispatches the next run with `gh workflow run` (allowed with `GITHUB_TOKEN`; needs `actions: write`). A sparse backstop cron (`17 */3 * * *`) restarts the relay if a hand-off is lost. Concurrency group `scrape` keeps exactly one relay running; queued runs replace each other, so "cancelled" runs in the history are expected. A failed scrape is retried 3× and then that hour is skipped, so a WMATA outage doesn't break the chain.
+
+`scripts/commit_snapshot.sh` is the self-healing push: commit `data/` only, rebase the append-only CSV, re-render `docs/index.html` from the merged data (never 3-way-merges generated HTML), amend into the single snapshot commit, retry. Bot identity: `github-actions[bot]`. If you push manually, expect frequent merges from the bot. Edits to `scrape.sh`/`render.py`/the scripts take effect at the next relay segment (≤ ~6 h), not immediately.
+
+### Watchdog (`.github/workflows/watchdog.yml`)
+
+Scheduled (`41 * * * *`, so it fires whenever GitHub lets it), independent of the relay. `scripts/check_freshness.py` flags the scraper as behind when the newest snapshot is > 3 h old or < 20 of the last 24 UTC hours have a snapshot. Behind → opens one issue labelled `scraper-alert` (GitHub notifies the repo owner by email); healthy again → closes it with a recovery comment. The job stays green either way, so there is one notification per incident. Test locally: `python3 scripts/check_freshness.py 2026-11-02T03:00:00Z` (checks as of that time; writes `freshness.md`).
 
 ### `scrape.sh`
 

@@ -2,12 +2,19 @@ name: scrape
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    # Backstop only: each run takes ~5 hourly snapshots and dispatches the next
+    # run itself (scripts/scrape_loop.sh). This restarts the relay if a hand-off
+    # is ever lost. Off minute 0, where GitHub's scheduler is busiest.
+    - cron: "17 */3 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write   # the relay dispatches its own next run
 
+# Exactly one relay at a time. A run queued behind it (the hand-off or a backstop
+# cron) waits; the newest queued run replaces any older one, so the run history
+# shows some "cancelled" backstop runs. That is expected.
 concurrency:
   group: scrape
   cancel-in-progress: false
@@ -15,46 +22,12 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v5
 
-      - name: Run scraper
+      - name: Scrape every hour, then hand off to the next run
         env:
           WMATA_API_KEY: ${{ secrets.WMATA_API_KEY }}
-        run: ./scrape.sh
-
-      - name: Render frontend
-        run: python3 render.py
-
-      - name: Commit and push if changed
-        run: |
-          if [[ -z "$(git status --porcelain data/ docs/)" ]]; then
-            echo "No changes to commit."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Commit data only; docs/index.html is a pure function of the CSV and
-          # is regenerated AFTER we sync with the remote, so the generated HTML
-          # is never 3-way-merged. Append-only CSV rebases cleanly.
-          git add data/
-          git commit -m "data: hourly snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
-          git checkout -- docs/ 2>/dev/null || true
-          for attempt in 1 2 3; do
-            if ! git pull --rebase origin "$GITHUB_REF_NAME"; then
-              git rebase --abort || true
-              sleep 5
-              continue
-            fi
-            python3 render.py
-            git add docs/
-            git commit --amend --no-edit
-            if git push; then
-              echo "pushed (attempt $attempt)"
-              exit 0
-            fi
-            echo "push rejected, remote advanced; retrying (attempt $attempt)"
-            sleep 5
-          done
-          echo "push failed after retries"
-          exit 1
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/scrape_loop.sh

@@ -1,0 +1,49 @@
+name: watchdog
+
+# Opens a "scraper-alert" issue (GitHub emails the repo owner) when hourly
+# snapshots stop or go missing, and closes it once they're back. One issue per
+# incident; the job itself stays green so an outage doesn't send an email every
+# hour. Runs on GitHub's own scheduler, independently of the scrape relay.
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: watchdog
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check snapshot freshness
+        id: check
+        run: python3 scripts/check_freshness.py
+
+      - name: Open or close the alert issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          STALE: ${{ steps.check.outputs.stale }}
+        run: |
+          label=scraper-alert
+          open="$(gh issue list --label "$label" --state open --json number -q '.[0].number')"
+          if [[ "$STALE" == true && -z "$open" ]]; then
+            gh label create "$label" --color B60205 \
+              --description "Opened and closed by the watchdog workflow" 2>/dev/null || true
+            gh issue create --label "$label" --body-file freshness.md \
+              --title "Scraper alert: hourly escalator snapshots are missing"
+          elif [[ "$STALE" == true ]]; then
+            echo "alert already open: #$open"
+          elif [[ -n "$open" ]]; then
+            gh issue close "$open" --comment "$(cat freshness.md)"
+          else
+            echo "healthy"
+          fi
